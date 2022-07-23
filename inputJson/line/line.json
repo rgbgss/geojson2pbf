@@ -1,0 +1,23 @@
+{
+    "type": "FeatureCollection",
+    "features": [{
+        "type": "Feature",
+        "properties": {
+            "num": 111111111111,
+            "name": "test_data",
+            "describe": "测试数据"
+        },
+        "geometry": {
+            "type": "MultiLineString",
+            "coordinates": [
+                [
+                    [86.122724, 44.448963],
+                    [86.121896, 44.449754],
+                    [85.979196, 44.203647],
+                    [86.12561, 44.250886],
+                    [86.122724, 44.448963]
+                ]
+            ]
+        }
+    }]
+}

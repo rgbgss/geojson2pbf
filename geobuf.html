@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <title>geobuf</title>
+    <style>
+        html,
+        body,
+        #app {
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            position: absolute;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="app">
+        <div>解析请选择./outputPbf/line/下的文件; 编译请选择./inputJson/line/下的文件；或自行修改代码中的文件路径</div>
+        <div>1.选择文件 </br>
+            <input type="file" id="docfile" onchange="onFileChange()" multiple />
+        </div>
+        <div>2.解析or编译</div>
+        <button onclick="runTransform()">decode pbf</button>
+        <button onclick="runTransform2()">ecode geojson</button>
+        <div>3.查看结果</br>
+            文件名称：<span id="decodeNumberBox"></span></div>
+        <div>文件内容示例：<div id="outputBox"></div>
+        </div>
+    </div>
+</body>
+<script src="./lib/geobuf-dev.js"></script>
+<script src="./lib/pbf.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+<script>
+    console.log(geobuf)
+    let fileList = []
+
+    function onFileChange() {
+        const docObj = document.getElementById('docfile');
+        fileList = docObj.files
+    }
+
+    function downloadJSON(pbfbuffer) {
+        let pom = document.createElement('a');
+        pom.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(pbfbuffer));
+        pom.setAttribute('download', 'data.pbf');
+        if (document.createEvent) {
+            let event = document.createEvent('MouseEvents');
+            event.initEvent('click', true, true);
+            pom.dispatchEvent(event);
+        } else {
+            pom.click();
+        }
+    }
+
+    async function runTransform() {
+        if (fileList.length === 0) return;
+        const len = fileList.length;
+        var data = '',
+            decodeFileName = '';
+        for (let i = 0; i < len; i++) {
+            const fileItem = fileList[i];
+            // 解析
+            const url = './outputPbf/line/' + fileItem.name; // 输入文件为pbf文件
+            const result = await axios.get(url, {
+                responseType: 'arraybuffer'
+            });
+            const dataPbf = new Pbf(result.data)
+            data = geobuf.decode(dataPbf);
+            if (data.features.length) {
+                decodeFileName = decodeFileName + i + ')' + fileItem.name + ';'
+            }
+        }
+
+        const decodeNumberBox = document.getElementById('decodeNumberBox');
+        decodeNumberBox.innerHTML = decodeFileName;
+        const outputBox = document.getElementById('outputBox');
+        outputBox.innerHTML = JSON.stringify(data);
+    }
+
+    // 编译
+    async function runTransform2() {
+        if (fileList.length === 0) return;
+        const len = fileList.length;
+        var data = '',
+            encodeFileName = '';
+        for (let i = 0; i < len; i++) {
+            const fileItem = fileList[i];
+            // 编译
+            const url = './inputJson/line/' + fileItem.name; // 输入文件为json文件
+            const geojson = await axios.get(url);
+            const pbfbuffer = geobuf.encode(geojson, new Pbf());
+            downloadJSON(pbfbuffer);
+            data = pbfbuffer;
+            if (data) {
+                encodeFileName = encodeFileName + i + ')' + fileItem.name + ';'
+            }
+        }
+
+        const decodeNumberBox = document.getElementById('decodeNumberBox');
+        decodeNumberBox.innerHTML = encodeFileName;
+        const outputBox = document.getElementById('outputBox');
+        outputBox.innerHTML = JSON.stringify(data);
+    }
+</script>
+
+</html>

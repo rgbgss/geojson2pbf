@@ -1,0 +1,22 @@
+{
+  "name": "geojson-compression",
+  "author": "rgbgss",
+  "devDependencies": {
+    "geobuf": "3.0.2",
+    "pbf": "3.2.1"
+  },
+  "keywords": [
+    "geographic",
+    "buffer",
+    "protobuf",
+    "format",
+    "compression",
+    "geojson"
+  ],
+  "license": "ISC",
+  "dependencies": {
+    "@turf/polygon-to-line": "^6.5.0",
+    "geobuf": "3.0.2",
+    "pbf": "3.2.1"
+  }
+}
